@@ -205,8 +205,8 @@ for ir1 in range(0, len(df)):
                 EmpLk = ''
             '''
 
-            if df.iat[ir1, 24] not in ('0', '0.0', '#N/A', '', ' '):
-                EmpLk = int(df.iat[ir1, 24])
+            if str(df.iat[ir1, 24]) not in ('0', '0.0', '#N/A', '', ' '):
+                EmpLk = str(df.iat[ir1, 24])
             else:
                 EmpLk = str('')
 
@@ -216,8 +216,8 @@ for ir1 in range(0, len(df)):
                 Found = ''
             '''
 
-            if df.iat[ir1, 25] not in (0, '0', '0.0', '#N/A', '', ' '):
-                Found = int(df.iat[ir1, 25])
+            if str(df.iat[ir1, 25]) not in (0, '0', '0.0', '#N/A', '', ' '):
+                Found = str(df.iat[ir1, 25])
             else:
                 Found = str('')
 

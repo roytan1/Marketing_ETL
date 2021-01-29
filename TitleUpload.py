@@ -1,5 +1,5 @@
 '''
-The objective of this script is to insert and update records from the Source file with the data currently residing in the database.
+The objective of this script is to insert and update records from the TitleName Source file with the data currently residing in the database.
 Check the process flow chart for the business logic defined by the business.
 '''
 
@@ -114,8 +114,7 @@ ufRow = 1
 # print(len(df))
 # print(len(df.columns))
 
-# Check for identical company
-
+# Check for identical TitleName
 for ir1 in range(0, len(df)):
     # for ir1 in range(8, 9):
     for ic1 in range(0, len(df.columns)):
@@ -125,10 +124,8 @@ for ir1 in range(0, len(df)):
         if (ic1 == 11):
             itemFound = False
 
-            # Id = int(df.iat[ir1, 0])
-
-            if df.iat[ir1, 0] not in ('0', '0.0', '#N/A', '', ' '):
-                TId = int(df.iat[ir1, 0])
+            if str(df.iat[ir1, 0]) not in ('0', '0.0', '#N/A', '', ' '):
+                TId = str(df.iat[ir1, 0])
             else:
                 TId = str('')
 
@@ -136,9 +133,10 @@ for ir1 in range(0, len(df)):
             if Name in ('0', '0.0', '', ' ', '$N/A'):
                 Name = ''
 
-            Meta = str(df.iat[ir1, 2])
-            if Meta in ('0', '0.0', '', ' ', '$N/A'):
-                Meta = ''
+            if str(df.iat[ir1, 2]) not in ('0', '0.0', '#N/A', '', ' '):
+                Meta = int(df.iat[ir1, 2])
+            else:
+                Meta = str('')
 
             Mode = str(df.iat[ir1, 3])
             if Mode in ('0', '0.0', '', ' ', '$N/A'):
@@ -223,7 +221,7 @@ for ir1 in range(0, len(df)):
 
                 # B. If IGDB is not blank
                 if IGDB != '':
-
+                    # print(Name, TId, IGDB, NewZoo, "1")
                     for row in result:
                         # print(row[0])
                         # Cache database into variable list
@@ -242,16 +240,12 @@ for ir1 in range(0, len(df)):
                         db_NewZoo = row[12]
                         db_Id = row[13]
 
-                        # print(TId, Name, db_IGDB, IGDB, "2A")
-
                         # if NewZoo is not blank and IGDB or NewZoo match
                         if str(NewZoo) != '':
-                            # print(Name, db_Name, LId, db_LId, "1")
+                            
                             # C. If IGDB is not blank and record found in database base onIGDB / If IGDB is not blank and record found based on IGDB and NewZoo - Update
                             if str(IGDB) == str(db_IGDB) or str(NewZoo) == str(db_NewZoo):
-                                print(TId, Name, IGDB, db_IGDB,  3)
-                                # print(Name, db_Name, LId, db_LId, "2")
-
+                            
                                 IGDB = str(IGDB)
 
                                 if TId in ('0', '', ' ', '$N/A'):
@@ -293,8 +287,6 @@ for ir1 in range(0, len(df)):
                                 itemFound = True
 
                                 try:
-                                    # print("Update " + Name + " 1")
-                                    # print("3")
                                     cursor1 = conn.cursor()
 
                                     cursor1.execute(
@@ -307,6 +299,8 @@ for ir1 in range(0, len(df)):
                                     conn.commit()
 
                                     cursor1.close()
+
+                                    break
 
                                 except (pyodbc.Error, pyodbc.Warning) as err:
                                     print("Update Error on TitleName = " + str(Name))
@@ -327,13 +321,17 @@ for ir1 in range(0, len(df)):
                                     worksheet.write(ExptRow, 12, NewZoo)
                                     worksheet.write(ExptRow, 13, err)
 
+                                    break
+
                             else:
                                 Ratio = fuzz.ratio(Name, db_Name)
 
+                                # if (Ratio >=80):
+                                    # print(TId, Name, db_Name, IGDB, db_IGDB, Ratio, -4)
+                                
                                 if (Ratio >= 90):
-                                    itemFound = True
 
-                                    print(TId, Name, db_Name, IGDB, db_IGDB, Ratio, 4)
+                                    itemFound = True
 
                                     worksheet1.write(ufRow, 0, TId)
                                     worksheet1.write(ufRow, 1, Name)
@@ -352,13 +350,12 @@ for ir1 in range(0, len(df)):
 
                                     ufRow = ufRow + 1
 
+                                    break
 
                         # if NewZoo is blank and IGDB match
                         else:
                             if str(IGDB) == str(db_IGDB):
-                                print(TId, Name, IGDB, db_IGDB,  5)
-                                # print(Name, db_Name, LId, db_LId, "2")
-
+                                                                
                                 IGDB = str(IGDB)
 
                                 if TId in ('0', '', ' ', '$N/A'):
@@ -400,7 +397,6 @@ for ir1 in range(0, len(df)):
                                 itemFound = True
 
                                 try:
-                                    # print("Update " + Name + " 1")
                                     cursor1 = conn.cursor()
 
                                     cursor1.execute(
@@ -413,6 +409,8 @@ for ir1 in range(0, len(df)):
                                     conn.commit()
 
                                     cursor1.close()
+
+                                    break
 
                                 except (pyodbc.Error, pyodbc.Warning) as err:
                                     print("Update Error on TitleName = " + str(Name))
@@ -433,25 +431,28 @@ for ir1 in range(0, len(df)):
                                     worksheet.write(ExptRow, 12, NewZoo)
                                     worksheet.write(ExptRow, 13, err)
 
-                                    '''
-                                    if not itemFound:
-                                        print("6")
+                                    break    
+
+                                '''
                                 if not itemFound:
-                                    print("7")
+                                    print("6")
                             if not itemFound:
-                                print("8")
+                                print("7")
                         if not itemFound:
-                            print("9")
-                        '''
+                            print("8")
+                    if not itemFound:
+                        print("9")
+                    '''
 
                             else:
                                 Ratio = fuzz.ratio(Name, db_Name)
+                                
+                                #if (Ratio >= 60):
+                                #    print(TId, Name, db_Name, IGDB, db_IGDB, Ratio, -6)
 
                                 if (Ratio >= 90):
                                     itemFound = True
 
-                                    print(TId, Name, db_Name, IGDB, db_IGDB, Ratio, 6)
-
                                     worksheet1.write(ufRow, 0, TId)
                                     worksheet1.write(ufRow, 1, Name)
                                     worksheet1.write(ufRow, 2, Meta)
@@ -469,125 +470,47 @@ for ir1 in range(0, len(df)):
 
                                     ufRow = ufRow + 1
 
-                    # If the record from excel is not found in database (Based on LinkedInId, CompanyName, Country and State)
+                                    break
+                    
+                    # If the record from excel does not match the biz logic condition (Based on LinkedInId, CompanyName, Country and State)
                     if not itemFound:
-                        # print(TId, Name, IGDB, db_IGDB, 4)
-                        # print(TId, Name, db_Name)
-                        # Ratio = fuzz.ratio(Name, db_Name)
 
-                        # if (Ratio <= 90):
-                            # print(LId, db_LId, Name, db_Name, "3")
-                            print(TId, Name, db_Name, IGDB, db_IGDB,  Ratio, 7)
-                            # print(Name, db_Name, "Fuzzy check")
-                            # print(LId, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL,
-                            # Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_LId)
+                        TId = str(TId)
 
-                            TId = str(TId)
+                        cursor4 = conn.cursor()
 
-                            '''
-                            if TId in ('0', '', ' ', '$N/A'):
-                                TId = db_TId
+                        try:
+                            cursor4.execute(
+                                "INSERT INTO GamesTitles(TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, "
+                                "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website) "
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                                , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo
+                            )
 
-                            if Name in ('0', '', ' ', '$N/A'):
-                                Name = db_Name
+                            conn.commit()
+                            cursor4.close()
 
-                            if Meta in ('0', '', ' ', '$N/A'):
-                                Meta = db_Meta
+                        except (pyodbc.Error, pyodbc.Warning) as err:
+                            print("Insert Error on TitleName = " + str(Name))
+                            err = str(err)
 
-                            if Mode in ('0', '', ' ', '$N/A'):
-                                Mode = db_Mode
+                            worksheet.write(ExptRow, 0, TId)
+                            worksheet.write(ExptRow, 1, Name)
+                            worksheet.write(ExptRow, 2, Meta)
+                            worksheet.write(ExptRow, 3, Mode)
+                            worksheet.write(ExptRow, 4, Genre)
+                            worksheet.write(ExptRow, 5, Themes)
+                            worksheet.write(ExptRow, 6, Series)
+                            worksheet.write(ExptRow, 7, PP)
+                            worksheet.write(ExptRow, 8, Franchises)
+                            worksheet.write(ExptRow, 9, Engine)
+                            worksheet.write(ExptRow, 10, AltName)
+                            worksheet.write(ExptRow, 11, IGDB)
+                            worksheet.write(ExptRow, 12, NewZoo)
+                            worksheet.write(ExptRow, 13, err)
 
-                            if Genre in ('0', '', ' ', '$N/A'):
-                                Genre = db_Genre
+                            ExptRow = ExptRow + 1
 
-                            if Themes in ('0', '', ' ', '$N/A'):
-                                Themes = db_Themes
-
-                            if Series in ('0', '', ' ', '$N/A'):
-                                Series = db_Series
-
-                            if PP in ('0', '', ' ', '$N/A'):
-                                PP = db_PP
-
-                            if Franchises in ('0', '', ' ', '$N/A'):
-                                Franchises = db_Franchises
-
-                            if Engine in ('0', '', ' ', '$N/A'):
-                                Engine = db_Engine
-
-                            if AltName in ('0', '', ' ', '$N/A'):
-                                AltName = db_AltName
-
-                            if NewZoo in ('0', '', ' ', '$N/A'):
-                                NewZoo = db_NewZoo
-                            '''
-                            # try:
-
-                            # print(Name, LId, "3")
-
-                            # print('2', VId, Name, Region, Country, EmpLk, 'Insert Record')
-                            cursor4 = conn.cursor()
-
-                            try:
-                                # print("Insert " + Name + " 4 ")
-                                cursor4.execute(
-                                    "INSERT INTO GamesTitles(TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, "
-                                    "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website) "
-                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                                    , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo
-                                )
-
-                                conn.commit()
-                                cursor4.close()
-
-                            except (pyodbc.Error, pyodbc.Warning) as err:
-                                print("Insert Error on TitleName = " + str(Name))
-                                err = str(err)
-
-                                worksheet.write(ExptRow, 0, TId)
-                                worksheet.write(ExptRow, 1, Name)
-                                worksheet.write(ExptRow, 2, Meta)
-                                worksheet.write(ExptRow, 3, Mode)
-                                worksheet.write(ExptRow, 4, Genre)
-                                worksheet.write(ExptRow, 5, Themes)
-                                worksheet.write(ExptRow, 6, Series)
-                                worksheet.write(ExptRow, 7, PP)
-                                worksheet.write(ExptRow, 8, Franchises)
-                                worksheet.write(ExptRow, 9, Engine)
-                                worksheet.write(ExptRow, 10, AltName)
-                                worksheet.write(ExptRow, 11, IGDB)
-                                worksheet.write(ExptRow, 12, NewZoo)
-                                worksheet.write(ExptRow, 13, err)
-
-                                ExptRow = ExptRow + 1
-
-                                # print(Web, LId, 'Record Updated', Stmt)
-                                # print('5', LId, Name, Region, Country, 'Create Record')
-                                # print(VId, now, now1, now2)
-
-                                '''
-                                else:
-                                    # print("Insert Error on TitleName = " + str(Name))
-                                    # err = str(err)
-                                    print(TId, Name, db_Name, IGDB, db_IGDB, 6)
-        
-                                    worksheet1.write(ufRow, 0, TId)
-                                    worksheet1.write(ufRow, 1, Name)
-                                    worksheet1.write(ufRow, 2, Meta)
-                                    worksheet1.write(ufRow, 3, Mode)
-                                    worksheet1.write(ufRow, 4, Genre)
-                                    worksheet1.write(ufRow, 5, Themes)
-                                    worksheet1.write(ufRow, 6, Series)
-                                    worksheet1.write(ufRow, 7, PP)
-                                    worksheet1.write(ufRow, 8, Franchises)
-                                    worksheet1.write(ufRow, 9, Engine)
-                                    worksheet1.write(ufRow, 10, AltName)
-                                    worksheet1.write(ufRow, 11, IGDB)
-                                    worksheet1.write(ufRow, 12, NewZoo)
-                                    # worksheet.write(ExptRow, 13, err)
-        
-                                    ufRow = ufRow + 1
-                                '''
 
 my_file = Path(dst)
 if my_file.is_file():

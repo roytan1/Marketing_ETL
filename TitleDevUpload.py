@@ -40,10 +40,6 @@ dst = dir10 + "_" + dt + ".xlsx"
 # dst = dir5 + "_" + dt + ".xlsx"
 
 xptDev = dir11 + "_Dev_Exception" + "_" + dt + ".xlsx"
-# xptPub = dir11 + "_Pub_Exception" + "_" + dt + ".xlsx"
-# xptSupDev = dir11 + "_SupDev_Exception" + "_" + dt + ".xlsx"
-# xptPortDev = dir11 + "_PortDev_Exception" + "_" + dt + ".xlsx"
-# xptRelDate = dir11 + "_RelDate_Exception" + "_" + dt + ".xlsx"
 
 # uft = dir11 + "_UnFound_Title" + "_" + dt + ".xlsx"
 
@@ -59,45 +55,6 @@ result = cursor.fetchall()
 
 cursor.close()
 
-'''
-cursor1 = conn.cursor()
-cursor1.execute(
-    'SELECT ID, TitleID, TitleName, IGDB_Website, NewZoo_Website, Publisher, StudioID, VTSID FROM Marketing.dbo.GamesTitles_Pub ORDER BY ID'
-)
-
-result1 = cursor1.fetchall()
-
-cursor1.close()
-
-cursor2 = conn.cursor()
-cursor2.execute(
-    'SELECT ID, TitleID, TitleName, IGDB_Website, NewZoo_Website, SupportDev, StudioID, VTSID FROM Marketing.dbo.GamesTitles_SupDev ORDER BY ID'
-)
-
-result2 = cursor2.fetchall()
-
-cursor2.close()
-
-cursor3 = conn.cursor()
-cursor3.execute(
-    'SELECT ID, TitleID, TitleName, IGDB_Website, NewZoo_Website, PortDev, StudioID, VTSID FROM Marketing.dbo.GamesTitles_PortDev ORDER BY ID'
-)
-
-result3 = cursor3.fetchall()
-
-cursor3.close()
-
-cursor4 = conn.cursor()
-cursor4.execute(
-    'SELECT ID, TitleID, TitleName, ReleaseDate, IGDB_Website, NewZoo_Website FROM Marketing.dbo.GamesTitles_RelDate ORDER BY ID'
-)
-
-result4 = cursor4.fetchall()
-
-cursor4.close()
-
-'''
-
 cursor1 = conn.cursor()
 cursor1.execute(
     'SELECT ID, TitleID, TitleName FROM Marketing.dbo.GamesTitles ORDER BY ID'
@@ -106,7 +63,6 @@ cursor1.execute(
 result1 = cursor1.fetchall()
 
 cursor1.close()
-
 
 # Create Developer ExceptionCatch file and Remove file if exists
 my_file = Path('%s' % (xptDev))
@@ -117,19 +73,6 @@ else:
     print("No Developer Exception File found ....")
 
 print("Creating Developer Exception File ....")
-
-
-'''
-# Create Unfound Title file and Remove file if exists
-my_file1 = Path('%s' % (uft))
-if my_file1.is_file():
-    os.remove('%s' % (uft))
-else:
-    # print("The file does not exist")
-    print("No UnFound Title File found ....")
-
-print("Creating UnFound Title File ....")
-'''
 
 # For first upload of Developer worksheet
 df = pd.read_excel('%s' % (dir9), sheet_name='Developers', engine='openpyxl')
@@ -150,109 +93,7 @@ for col_num, data in enumerate(df_Header):
 
 worksheet.write(0, 7, 'Error')
 
-'''
-
-# For first upload of Publisher worksheet
-df1 = pd.read_excel('%s' % (dir9), sheet_name='Publishers', engine='openpyxl')
-# For VendorUpdate_NewValue
-# df = pd.read_excel('%s' %(dir2), sheet_name='Titles', engine='openpyxl')
-
-df1 = df1.replace(np.nan, ' ', regex=True)
-df_Header1 = df1.columns.ravel()
-
-# Create Publisher Exception Worksheet
-workbook1 = xlsxwriter.Workbook('%s' % (xptPub))
-worksheet1 = workbook1.add_worksheet()
-
-for col_num, data in enumerate(df_Header1):
-    # print(data)
-    if col_num <= 6:
-        worksheet1.write(0, col_num, data)
-
-worksheet1.write(0, 7, 'Error')
-
-
-# For first upload of SupportingDevelopers worksheet
-df2 = pd.read_excel('%s' % (dir9), sheet_name='SupportingDevelopers', engine='openpyxl')
-# For VendorUpdate_NewValue
-# df = pd.read_excel('%s' %(dir2), sheet_name='Titles', engine='openpyxl')
-
-df2 = df2.replace(np.nan, ' ', regex=True)
-df_Header2 = df2.columns.ravel()
-
-# Create Exception Worksheet
-workbook2 = xlsxwriter.Workbook('%s' % (xptSupDev))
-worksheet2 = workbook2.add_worksheet()
-
-for col_num, data in enumerate(df_Header2):
-    # print(data)
-    if col_num <= 6:
-        worksheet.write(0, col_num, data)
-
-worksheet2.write(0, 7, 'Error')
-
-
-# For first upload of PortingDevelopers Worksheet
-df3 = pd.read_excel('%s' % (dir9), sheet_name='PortingDevelopers', engine='openpyxl')
-# For VendorUpdate_NewValue
-# df = pd.read_excel('%s' %(dir2), sheet_name='Titles', engine='openpyxl')
-
-df3 = df3.replace(np.nan, ' ', regex=True)
-df_Header3 = df3.columns.ravel()
-
-# Create Exception Worksheet
-workbook3 = xlsxwriter.Workbook('%s' % (xptPortDev))
-worksheet3 = workbook3.add_worksheet()
-
-for col_num, data in enumerate(df_Header3):
-    # print(data)
-    if col_num <= 6:
-        worksheet3.write(0, col_num, data)
-
-worksheet3.write(0, 7, 'Error')
-
-
-# For first upload of Release Date Worksheet
-df4 = pd.read_excel('%s' % (dir9), sheet_name='ReleaseDates', engine='openpyxl')
-# For VendorUpdate_NewValue
-# df = pd.read_excel('%s' %(dir2), sheet_name='Titles', engine='openpyxl')
-
-df4 = df4.replace(np.nan, ' ', regex=True)
-df_Header4 = df4.columns.ravel()
-
-# Create Exception Worksheet
-workbook4 = xlsxwriter.Workbook('%s' % (xptRelDate))
-worksheet4 = workbook4.add_worksheet()
-
-for col_num, data in enumerate(df_Header4):
-    # print(data)
-    if col_num <= 5:
-        worksheet.write(0, col_num, data)
-
-worksheet.write(0, 6, 'Error')
-
-# Create UnFound Worksheet
-workbook1 = xlsxwriter.Workbook('%s' % (uft))
-worksheet1 = workbook1.add_worksheet()
-
-for col_num, data in enumerate(df_Header):
-    # print(data)
-    if col_num <= 12:
-        worksheet1.write(0, col_num, data)
-
-# workbook.close()
-'''
-
 ExptRow = 1
-# ufRow = 1
-
-# print(len(df))
-# print(len(df.columns))
-
-# Check for identical company
-
-# value1 = 1
-# value2 = 1
 
 # Start of Developer File Load
 for ir in range(0, len(df)):
@@ -260,7 +101,6 @@ for ir in range(0, len(df)):
     for ic in range(0, len(df.columns)):
         # print(ir1, ic1)
         if ic == 1:
-            #print("First Loop", value1)
 
             itemFound = False
             itemFound1 = False
@@ -286,7 +126,7 @@ for ir in range(0, len(df)):
             if Developers in ('0', '0.0', '', ' ', '$N/A'):
                 Developers = ''
 
-            if df.iat[ir, 5] not in ('0', '0.0', '#N/A', '', ' '):
+            if str(df.iat[ir, 5]) not in ('0', '0.0', '#N/A', '', ' '):
                 StudioID = int(df.iat[ir, 5])
             else:
                 StudioID = str('')
@@ -295,12 +135,8 @@ for ir in range(0, len(df)):
             if VTSID in ('0', '0.0', '', ' ', '$N/A'):
                 VTSID = ''
 
-            # print(TId, Name, IGDB, NewZoo, Developers, StudioID, VTSID, "Start")
-
             # A. If database is blank, it is an initial upload
             if len(result) == 0:
-
-                # if str(Name) != '':
 
                 for row1 in result1:
 
@@ -311,10 +147,6 @@ for ir in range(0, len(df)):
                     # print(db_ID1, TId, Name, db_Name1, 1)
 
                     if str(Name) == str(db_Name1):
-
-                        # print("Second Loop", value2)
-
-                        # print(db_ID1, db_TID1, db_Name1, TId, Name, Developers, StudioID, VTSID, 2)
 
                         itemFound = True
 
@@ -331,6 +163,8 @@ for ir in range(0, len(df)):
                             conn.commit()
                             cursor2.close()
 
+                            break
+
                         except (pyodbc.Error, pyodbc.Warning) as err:
                             print("Insert Error on TitleName_Dev = " + str(Name))
                             err = str(err)
@@ -346,10 +180,10 @@ for ir in range(0, len(df)):
 
                             ExptRow = ExptRow + 1
 
-                    # value2 + 1
+                            break
+
             # A. Database is not blank, NewValue file upload
             else:
-                # print("Test1")
                 for row in result:
 
                     db_ID = row[0]
@@ -361,7 +195,7 @@ for ir in range(0, len(df)):
                     db_StudioID = row[6]
                     db_VTSID = row[7]
 
-                    # if Title with different publisher Found in Publisher table
+                    # if Title with different developer Found in developer table
                     # if str(Valid) != str(db_Valid):
                     if str(Name) == str(db_Name) and str(Developers) == str(db_Developer) and str(IGDB) == str(db_IGDB):
                         itemFound = True
@@ -379,10 +213,8 @@ for ir in range(0, len(df)):
 
                         # if Title Found in title table
                         if str(Name) == str(db_Name1):
-                            # print(Name, db_Name, Publishers, db_Publisher, db_Name1, 2)
+                            
                             itemFound1 = True
-
-                            # print(db_ID1, TId, Name, db_Name, Developers, db_Name1, 3)
 
                             cursor3 = conn.cursor()
 
@@ -396,6 +228,8 @@ for ir in range(0, len(df)):
 
                                 conn.commit()
                                 cursor3.close()
+
+                                break
 
                             except (pyodbc.Error, pyodbc.Warning) as err:
                                 print("Insert Error on TitleName_Developer = " + str(Name))
@@ -411,6 +245,8 @@ for ir in range(0, len(df)):
                                 worksheet.write(ExptRow, 7, err)
 
                                 ExptRow = ExptRow + 1
+
+                                break
 
                     if not itemFound1:
                         # print("Insert Error on TitleName_Publisher = " + str(Name))
@@ -428,9 +264,7 @@ for ir in range(0, len(df)):
                         ExptRow = ExptRow + 1
 
         # End of Developer File Load
-
-        # value1 + 1
-
+        
 my_file = Path(dst)
 if my_file.is_file():
     os.remove('%s' % (dst))
@@ -439,10 +273,6 @@ else:
     shutil.copy(src, dst)
 
 workbook.close()
-# workbook1.close()
-# workbook2.close()
-# workbook3.close()
-# workbook4.close()
 
 # if no exception, remove the file
 if ExptRow == 1:

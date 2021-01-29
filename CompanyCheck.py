@@ -95,8 +95,8 @@ for ir in range(0, len(df)):
             else:
                 Id = 0
 
-            if df.iat[ir, 2] not in ('0', '0.0', '#N/A', '', ' '):
-                LId = int(df.iat[ir, 2])
+            if str(df.iat[ir, 2]) not in ('0', '0.0', '#N/A', '', ' '):
+                LId = str(df.iat[ir, 2])
             else:
                 LId = str('')
 
