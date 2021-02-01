@@ -110,6 +110,68 @@ worksheet.write(0, 6, 'Error')
 ExptRow = 1
 # ufRow = 1
 
+def insertRecord(db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow):
+
+    cursor = conn.cursor()
+
+    try:
+        # print("First Upload..... ")
+        cursor.execute(
+            "INSERT INTO GamesTitles_RelDate(ID, TitleID, TitleName, ReleasePlatform, ReleaseDate, IGDB_Website, NewZoo_Website) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)"
+            , db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo
+        )
+
+        conn.commit()
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Insert Error on TitleName_RelDate = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, TId)
+        worksheet.write(ExptRow, 1, Name)
+        worksheet.write(ExptRow, 2, RelPlatform)
+        worksheet.write(ExptRow, 3, RelDate)
+        worksheet.write(ExptRow, 4, IGDB)
+        worksheet.write(ExptRow, 5, NewZoo)
+        worksheet.write(ExptRow, 6, err)
+
+        ExptRow = ExptRow + 1
+
+        return ExptRow
+
+
+def updateRecord(TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow):
+
+    cursor = conn.cursor()
+
+    try:
+        # print("First Upload..... ")
+        cursor.execute(
+            "UPDATE Marketing.dbo.GamesTitles_RelDate SET ReleaseDate=? WHERE TitleName=? AND ReleasePlatform=? AND IGDB_Website=? "
+            , RelDate, Name, RelPlatform, IGDB
+        )
+
+        conn.commit()
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Update Error on TitleName_RelDate = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, TId)
+        worksheet.write(ExptRow, 1, Name)
+        worksheet.write(ExptRow, 2, RelPlatform)
+        worksheet.write(ExptRow, 3, RelDate)
+        worksheet.write(ExptRow, 4, IGDB)
+        worksheet.write(ExptRow, 5, NewZoo)
+        worksheet.write(ExptRow, 6, err)
+
+        ExptRow = ExptRow + 1
+
+        return ExptRow
+
 # print(len(df))
 # print(len(df.columns))
 
@@ -175,6 +237,8 @@ for ir in range(0, len(df)):
 
                         itemFound = True
 
+                        insertRecord(db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow)
+                        '''
                         cursor2 = conn.cursor()
 
                         try:
@@ -201,7 +265,7 @@ for ir in range(0, len(df)):
                             worksheet.write(ExptRow, 6, err)
 
                             ExptRow = ExptRow + 1
-
+                        '''
                     # value2 + 1
             # A. Database is not blank, NewValue file upload
             else:
@@ -220,11 +284,13 @@ for ir in range(0, len(df)):
                     # if str(Valid) != str(db_Valid):
                     if str(Name) == str(db_Name) and str(RelPlatform) == str(db_RelPlatform) and str(IGDB) == str(db_IGDB):
                         itemFound = True
-                        print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 1)
+                        # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 1)
 
                         if str(RelDate) != '' and str(RelDate) != str(db_RelDate):
-                            print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 2)
+                            # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 2)
 
+                            updateRecord(TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow)
+                            '''
                             cursor4 = conn.cursor()
 
                             try:
@@ -252,13 +318,14 @@ for ir in range(0, len(df)):
                                 ExptRow = ExptRow + 1
 
                             break
+                            '''
                         else:
-                            print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 3)
+                            # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 3)
                             break
 
                 # New Record found
                 if not itemFound:
-                    print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 4)
+                    # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 4)
 
                     for row2 in result1:
 
@@ -268,11 +335,10 @@ for ir in range(0, len(df)):
 
                         # if Title Found in title table
                         if str(Name) == str(db_Name1):
-                            # print(Name, db_Name, Publishers, db_Publisher, db_Name1, 2)
                             itemFound1 = True
-
-                            # print(db_ID1, TId, Name, db_Name, Developers, db_Name1, 3)
-
+                            
+                            insertRecord(db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow)
+                            '''
                             cursor3 = conn.cursor()
 
                             try:
@@ -299,6 +365,7 @@ for ir in range(0, len(df)):
                                 worksheet.write(ExptRow, 6, err)
 
                                 ExptRow = ExptRow + 1
+                            '''
 
                     if not itemFound1:
                         # print("Insert Error on TitleName_Publisher = " + str(Name))

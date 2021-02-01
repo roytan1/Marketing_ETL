@@ -90,7 +90,7 @@ for ir in range(0, len(df)):
 
         if ic == 0:
 
-            if df.iat[ir, 0] not in ('0', '0.0', '#N/A', '', ' '):
+            if str(df.iat[ir, 0]) not in ('0', '0.0', '#N/A', '', ' '):
                 Id = int(df.iat[ir, 0])
             else:
                 Id = 0

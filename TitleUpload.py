@@ -111,6 +111,79 @@ for col_num, data in enumerate(df_Header):
 ExptRow = 1
 ufRow = 1
 
+def insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, ExptRow):
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "INSERT INTO GamesTitles(TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, "
+            "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo
+        )
+
+        conn.commit()
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Insert Error on TitleName = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, TId)
+        worksheet.write(ExptRow, 1, Name)
+        worksheet.write(ExptRow, 2, Meta)
+        worksheet.write(ExptRow, 3, Mode)
+        worksheet.write(ExptRow, 4, Genre)
+        worksheet.write(ExptRow, 5, Themes)
+        worksheet.write(ExptRow, 6, Series)
+        worksheet.write(ExptRow, 7, PP)
+        worksheet.write(ExptRow, 8, Franchises)
+        worksheet.write(ExptRow, 9, Engine)
+        worksheet.write(ExptRow, 10, AltName)
+        worksheet.write(ExptRow, 11, IGDB)
+        worksheet.write(ExptRow, 12, NewZoo)
+        worksheet.write(ExptRow, 13, err)
+
+        ExptRow = ExptRow + 1
+
+        return ExptRow
+
+
+def updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id):
+    cursor = conn.cursor()
+    
+    try:
+    
+        cursor.execute(
+            "UPDATE Marketing.dbo.GamesTitles SET TitleID=?, TitleName=?, Metascore=?, GameModes=?, "
+            "Genre=?, Themes=?, Series=?, PlayerPerspectives=?, Franchises=?, GameEngine=?, AlternativeNames=?, "
+            "NewZoo_Website=? WHERE ID=?"
+            , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id
+        )
+
+        conn.commit()
+
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Update Error on TitleName = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, TId)
+        worksheet.write(ExptRow, 1, Name)
+        worksheet.write(ExptRow, 2, Meta)
+        worksheet.write(ExptRow, 3, Mode)
+        worksheet.write(ExptRow, 4, Genre)
+        worksheet.write(ExptRow, 5, Themes)
+        worksheet.write(ExptRow, 6, Series)
+        worksheet.write(ExptRow, 7, PP)
+        worksheet.write(ExptRow, 8, Franchises)
+        worksheet.write(ExptRow, 9, Engine)
+        worksheet.write(ExptRow, 10, AltName)
+        worksheet.write(ExptRow, 11, IGDB)
+        worksheet.write(ExptRow, 12, NewZoo)
+        worksheet.write(ExptRow, 13, err)
+
 # print(len(df))
 # print(len(df.columns))
 
@@ -181,40 +254,7 @@ for ir1 in range(0, len(df)):
             # A. If database is blank, it is an initial upload
             if len(result) == 0:
 
-                cursor2 = conn.cursor()
-
-                try:
-                    # print("First Upload..... ")
-                    cursor2.execute(
-                        "INSERT INTO GamesTitles(TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, "
-                        "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                        , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo
-                    )
-
-                    conn.commit()
-                    cursor2.close()
-
-                except (pyodbc.Error, pyodbc.Warning) as err:
-                    print("Insert Error on TitleName = " + str(Name))
-                    err = str(err)
-
-                    worksheet.write(ExptRow, 0, TId)
-                    worksheet.write(ExptRow, 1, Name)
-                    worksheet.write(ExptRow, 2, Meta)
-                    worksheet.write(ExptRow, 3, Mode)
-                    worksheet.write(ExptRow, 4, Genre)
-                    worksheet.write(ExptRow, 5, Themes)
-                    worksheet.write(ExptRow, 6, Series)
-                    worksheet.write(ExptRow, 7, PP)
-                    worksheet.write(ExptRow, 8, Franchises)
-                    worksheet.write(ExptRow, 9, Engine)
-                    worksheet.write(ExptRow, 10, AltName)
-                    worksheet.write(ExptRow, 11, IGDB)
-                    worksheet.write(ExptRow, 12, NewZoo)
-                    worksheet.write(ExptRow, 13, err)
-
-                    ExptRow = ExptRow + 1
+                insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, ExptRow)
 
             # A. Database is not blank, NewValue file upload
             else:
@@ -286,42 +326,7 @@ for ir1 in range(0, len(df)):
 
                                 itemFound = True
 
-                                try:
-                                    cursor1 = conn.cursor()
-
-                                    cursor1.execute(
-                                        "UPDATE Marketing.dbo.GamesTitles SET TitleID=?, TitleName=?, Metascore=?, GameModes=?, "
-                                        "Genre=?, Themes=?, Series=?, PlayerPerspectives=?, Franchises=?, GameEngine=?, AlternativeNames=?, "
-                                        "NewZoo_Website=? WHERE ID=?"
-                                        , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id
-                                    )
-
-                                    conn.commit()
-
-                                    cursor1.close()
-
-                                    break
-
-                                except (pyodbc.Error, pyodbc.Warning) as err:
-                                    print("Update Error on TitleName = " + str(Name))
-                                    err = str(err)
-
-                                    worksheet.write(ExptRow, 0, TId)
-                                    worksheet.write(ExptRow, 1, Name)
-                                    worksheet.write(ExptRow, 2, Meta)
-                                    worksheet.write(ExptRow, 3, Mode)
-                                    worksheet.write(ExptRow, 4, Genre)
-                                    worksheet.write(ExptRow, 5, Themes)
-                                    worksheet.write(ExptRow, 6, Series)
-                                    worksheet.write(ExptRow, 7, PP)
-                                    worksheet.write(ExptRow, 8, Franchises)
-                                    worksheet.write(ExptRow, 9, Engine)
-                                    worksheet.write(ExptRow, 10, AltName)
-                                    worksheet.write(ExptRow, 11, IGDB)
-                                    worksheet.write(ExptRow, 12, NewZoo)
-                                    worksheet.write(ExptRow, 13, err)
-
-                                    break
+                                updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id)
 
                             else:
                                 Ratio = fuzz.ratio(Name, db_Name)
@@ -396,54 +401,17 @@ for ir1 in range(0, len(df)):
 
                                 itemFound = True
 
-                                try:
-                                    cursor1 = conn.cursor()
-
-                                    cursor1.execute(
-                                        "UPDATE Marketing.dbo.GamesTitles SET TitleID=?, TitleName=?, Metascore=?, GameModes=?, "
-                                        "Genre=?, Themes=?, Series=?, PlayerPerspectives=?, Franchises=?, GameEngine=?, AlternativeNames=?, "
-                                        "NewZoo_Website=? WHERE ID=?"
-                                        , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id
-                                    )
-
-                                    conn.commit()
-
-                                    cursor1.close()
-
-                                    break
-
-                                except (pyodbc.Error, pyodbc.Warning) as err:
-                                    print("Update Error on TitleName = " + str(Name))
-                                    err = str(err)
-
-                                    worksheet.write(ExptRow, 0, TId)
-                                    worksheet.write(ExptRow, 1, Name)
-                                    worksheet.write(ExptRow, 2, Meta)
-                                    worksheet.write(ExptRow, 3, Mode)
-                                    worksheet.write(ExptRow, 4, Genre)
-                                    worksheet.write(ExptRow, 5, Themes)
-                                    worksheet.write(ExptRow, 6, Series)
-                                    worksheet.write(ExptRow, 7, PP)
-                                    worksheet.write(ExptRow, 8, Franchises)
-                                    worksheet.write(ExptRow, 9, Engine)
-                                    worksheet.write(ExptRow, 10, AltName)
-                                    worksheet.write(ExptRow, 11, IGDB)
-                                    worksheet.write(ExptRow, 12, NewZoo)
-                                    worksheet.write(ExptRow, 13, err)
-
-                                    break    
-
-                                '''
-                                if not itemFound:
-                                    print("6")
-                            if not itemFound:
-                                print("7")
-                        if not itemFound:
-                            print("8")
-                    if not itemFound:
-                        print("9")
-                    '''
-
+                                updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id)
+                                
+                                #if not itemFound:
+                                #    print("6")
+                            #if not itemFound:
+                            #    print("7")
+                        #if not itemFound:
+                        #    print("8")
+                    #if not itemFound:
+                    #    print("9")
+                    
                             else:
                                 Ratio = fuzz.ratio(Name, db_Name)
                                 
@@ -477,40 +445,7 @@ for ir1 in range(0, len(df)):
 
                         TId = str(TId)
 
-                        cursor4 = conn.cursor()
-
-                        try:
-                            cursor4.execute(
-                                "INSERT INTO GamesTitles(TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, "
-                                "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website) "
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                                , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo
-                            )
-
-                            conn.commit()
-                            cursor4.close()
-
-                        except (pyodbc.Error, pyodbc.Warning) as err:
-                            print("Insert Error on TitleName = " + str(Name))
-                            err = str(err)
-
-                            worksheet.write(ExptRow, 0, TId)
-                            worksheet.write(ExptRow, 1, Name)
-                            worksheet.write(ExptRow, 2, Meta)
-                            worksheet.write(ExptRow, 3, Mode)
-                            worksheet.write(ExptRow, 4, Genre)
-                            worksheet.write(ExptRow, 5, Themes)
-                            worksheet.write(ExptRow, 6, Series)
-                            worksheet.write(ExptRow, 7, PP)
-                            worksheet.write(ExptRow, 8, Franchises)
-                            worksheet.write(ExptRow, 9, Engine)
-                            worksheet.write(ExptRow, 10, AltName)
-                            worksheet.write(ExptRow, 11, IGDB)
-                            worksheet.write(ExptRow, 12, NewZoo)
-                            worksheet.write(ExptRow, 13, err)
-
-                            ExptRow = ExptRow + 1
-
+                        insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, ExptRow)
 
 my_file = Path(dst)
 if my_file.is_file():

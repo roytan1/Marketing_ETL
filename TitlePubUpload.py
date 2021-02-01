@@ -86,6 +86,39 @@ worksheet.write(0, 7, 'Error')
 ExptRow = 1
 # ufRow = 1
 
+def InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID, ExptRow):
+    
+    cursor = conn.cursor()
+
+    try:
+        # print("First Upload..... ")
+        cursor.execute(
+            "INSERT INTO GamesTitles_Pub(ID, TitleID, TitleName, IGDB_Website, NewZoo_Website, Publisher, StudioID, VTSID) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            , db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID
+        )
+
+        conn.commit()
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Insert Error on TitleName_Pub = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, TId)
+        worksheet.write(ExptRow, 1, Name)
+        worksheet.write(ExptRow, 2, IGDB)
+        worksheet.write(ExptRow, 3, NewZoo)
+        worksheet.write(ExptRow, 4, Publishers)
+        worksheet.write(ExptRow, 5, StudioID)
+        worksheet.write(ExptRow, 6, VTSID)
+        worksheet.write(ExptRow, 7, err)
+
+        ExptRow = ExptRow + 1
+
+        return ExptRow
+
+
 # print(len(df))
 # print(len(df.columns))
 
@@ -149,32 +182,7 @@ for ir in range(0, len(df)):
 
                         itemFound = True
 
-                        cursor2 = conn.cursor()
-
-                        try:
-                            cursor2.execute(
-                                "INSERT INTO GamesTitles_Pub(ID, TitleID, TitleName, IGDB_Website, NewZoo_Website, Publisher, StudioID, VTSID) "
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-                                , db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID
-                                )
-
-                            conn.commit()
-                            cursor2.close()
-
-                        except (pyodbc.Error, pyodbc.Warning) as err:
-                            print("Insert Error on TitleName_Publisher = " + str(Name))
-                            err = str(err)
-
-                            worksheet.write(ExptRow, 0, TId)
-                            worksheet.write(ExptRow, 1, Name)
-                            worksheet.write(ExptRow, 2, IGDB)
-                            worksheet.write(ExptRow, 3, NewZoo)
-                            worksheet.write(ExptRow, 4, Publishers)
-                            worksheet.write(ExptRow, 5, StudioID)
-                            worksheet.write(ExptRow, 6, VTSID)
-                            worksheet.write(ExptRow, 7, err)
-
-                            ExptRow = ExptRow + 1
+                        InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID, ExptRow)
 
             # A. Database is not blank, NewValue file upload
             else:
@@ -210,33 +218,7 @@ for ir in range(0, len(df)):
                         if str(Name) == str(db_Name1):
                             itemFound1 = True
 
-                            cursor3 = conn.cursor()
-
-                            try:
-                                # print("First Upload..... ")
-                                cursor3.execute(
-                                    "INSERT INTO GamesTitles_Pub(ID, TitleID, TitleName, IGDB_Website, NewZoo_Website, Publisher, StudioID, VTSID) "
-                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-                                    , db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID
-                                )
-
-                                conn.commit()
-                                cursor3.close()
-
-                            except (pyodbc.Error, pyodbc.Warning) as err:
-                                print("Insert Error on TitleName_Publisher = " + str(Name))
-                                err = str(err)
-
-                                worksheet.write(ExptRow, 0, TId)
-                                worksheet.write(ExptRow, 1, Name)
-                                worksheet.write(ExptRow, 2, IGDB)
-                                worksheet.write(ExptRow, 3, NewZoo)
-                                worksheet.write(ExptRow, 4, Publishers)
-                                worksheet.write(ExptRow, 5, StudioID)
-                                worksheet.write(ExptRow, 6, VTSID)
-                                worksheet.write(ExptRow, 7, err)
-
-                                ExptRow = ExptRow + 1
+                            InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID, ExptRow)
 
                     if not itemFound1:
                         # print("Insert Error on TitleName_Publisher = " + str(Name))

@@ -96,8 +96,120 @@ ExptRow = 1
 # print(len(df))
 # print(len(df.columns))
 
-# Check for identical company
+def InsertRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, ExptRow):
 
+    cursor = conn.cursor()
+
+    try:
+        # print("First Upload..... ")
+        cursor.execute(
+            "INSERT INTO Marketing.dbo.Marketing_ETL(VTSID, LinkedInID, "
+            "CompanyName, Developer, SupportingDeveloper, PortingDeveloper, CompanyWebsite, "
+            "EmployeeRange, UltimateParent, Parent, Subsidiaries, City, RegionStateProvince, "
+            "Country, BusinessClassification, BusinessSubclassification, Active, [Source], "
+            "LinkedInURL, [Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, "
+            "Founded, Growth6mth, Growth1yr, Growth2yr) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            , VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, '', '', '', City, Region, Country, BizClass,
+            BizSub, Active, Source, URL, Desc, Typ, Add, Ph,
+            EmpLk, Found, SixMth, OneYr, TwoYr
+        )
+
+        conn.commit()
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Insert Error on Company = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, VId)
+        worksheet.write(ExptRow, 2, LId)
+        worksheet.write(ExptRow, 3, Name)
+        worksheet.write(ExptRow, 4, Dev)
+        worksheet.write(ExptRow, 5, SDev)
+        worksheet.write(ExptRow, 6, PDev)
+        worksheet.write(ExptRow, 7, Web)
+        worksheet.write(ExptRow, 8, EmpRange)
+        # worksheet.write(ExptRow, 9, UParent)
+        # worksheet.write(ExptRow, 10, Parent)
+        # worksheet.write(ExptRow, 11, Sub)
+        worksheet.write(ExptRow, 12, City)
+        worksheet.write(ExptRow, 13, Region)
+        worksheet.write(ExptRow, 14, Country)
+        worksheet.write(ExptRow, 15, BizClass)
+        worksheet.write(ExptRow, 16, BizSub)
+        worksheet.write(ExptRow, 17, Active)
+        worksheet.write(ExptRow, 18, Source)
+        worksheet.write(ExptRow, 19, URL)
+        worksheet.write(ExptRow, 20, Desc)
+        worksheet.write(ExptRow, 21, Typ)
+        worksheet.write(ExptRow, 22, Add)
+        worksheet.write(ExptRow, 23, Ph)
+        worksheet.write(ExptRow, 24, EmpLk)
+        worksheet.write(ExptRow, 25, Found)
+        worksheet.write(ExptRow, 26, SixMth)
+        worksheet.write(ExptRow, 27, OneYr)
+        worksheet.write(ExptRow, 28, TwoYr)
+        worksheet.write(ExptRow, 29, err)
+
+        ExptRow = ExptRow + 1
+
+        return ExptRow
+
+
+def UpdateRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Id):
+
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "UPDATE Marketing.dbo.Marketing_ETL SET LinkedInID=?, CompanyWebsite=?, EmployeeRange=?, "
+            "City=?, RegionStateProvince=?, Country=?, BusinessClassification=?, BusinessSubclassification=?, Active=?, Source=?, LinkedInURL=?, "
+            "[Description]=?, [Type]=?, CompanyAddress=?, Phone=?, EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, Growth1yr=?, Growth2yr= ? "
+            "WHERE ID=?"
+            , LId, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Id
+        )
+
+        conn.commit()
+
+        cursor.close()
+
+    except (pyodbc.Error, pyodbc.Warning) as err:
+        print("Update Error on Company = " + str(Name))
+        err = str(err)
+
+        worksheet.write(ExptRow, 0, VId)
+        worksheet.write(ExptRow, 2, LId)
+        worksheet.write(ExptRow, 3, Name)
+        worksheet.write(ExptRow, 4, Dev)
+        worksheet.write(ExptRow, 5, SDev)
+        worksheet.write(ExptRow, 6, PDev)
+        worksheet.write(ExptRow, 7, Web)
+        worksheet.write(ExptRow, 8, EmpRange)
+        # worksheet.write(ExptRow, 9, UParent)
+        # worksheet.write(ExptRow, 10, Parent)
+        # worksheet.write(ExptRow, 11, Sub)
+        worksheet.write(ExptRow, 12, City)
+        worksheet.write(ExptRow, 13, Region)
+        worksheet.write(ExptRow, 14, Country)
+        worksheet.write(ExptRow, 15, BizClass)
+        worksheet.write(ExptRow, 16, BizSub)
+        worksheet.write(ExptRow, 17, Active)
+        worksheet.write(ExptRow, 18, Source)
+        worksheet.write(ExptRow, 19, URL)
+        worksheet.write(ExptRow, 20, Desc)
+        worksheet.write(ExptRow, 21, Typ)
+        worksheet.write(ExptRow, 22, Add)
+        worksheet.write(ExptRow, 23, Ph)
+        worksheet.write(ExptRow, 24, EmpLk)
+        worksheet.write(ExptRow, 25, Found)
+        worksheet.write(ExptRow, 26, SixMth)
+        worksheet.write(ExptRow, 27, OneYr)
+        worksheet.write(ExptRow, 28, TwoYr)
+        worksheet.write(ExptRow, 29, err)
+
+# Check for identical company
 for ir1 in range(0, len(df)):
 # for ir1 in range(8, 9):
     for ic1 in range(0, len(df.columns)):
@@ -109,7 +221,12 @@ for ir1 in range(0, len(df)):
 
             # Id = int(df.iat[ir1, 0])
 
-            if df.iat[ir1, 2] not in ('0', '0.0', '#N/A', '', ' '):
+            if str(df.iat[ir1, 0]) not in (0, '0', '0.0', '#N/A', '', ' '):
+                VId = str(df.iat[ir1, 0])
+            else:
+                VId = str('')
+
+            if str(df.iat[ir1, 2]) not in ('0', '0.0', '#N/A', '', ' '):
                 LId = int(df.iat[ir1, 2])
             else:
                 LId = str('')
@@ -125,6 +242,7 @@ for ir1 in range(0, len(df)):
             SDev = str(df.iat[ir1, 5])
             if SDev in ('0', '0.0', '', ' ', '$N/A'):
                 SDev = ''
+
             PDev = str(df.iat[ir1, 6])
             if PDev in ('0', '0.0', '', ' ', '$N/A'):
                 PDev = ''
@@ -233,11 +351,6 @@ for ir1 in range(0, len(df)):
             if str(TwoYr) in ('0', '0.0', '', ' ', '$N/A'):
                 TwoYr = 0
 
-            if str(df.iat[ir1, 0]) not in (0, '0', '0.0', '#N/A', '', ' '):
-                VId = str(df.iat[ir1, 0])
-            else:
-                VId = str('')
-
             '''
             VId = df.iat[ir1, 0]
             if str(VId) in (0, '0', '0.0', '#N/A', '', ' '):
@@ -246,62 +359,8 @@ for ir1 in range(0, len(df)):
 
             # A. If database is blank, it is an initial upload
             if len(result) == 0:
-                cursor2 = conn.cursor()
 
-                try:
-                    # print("First Upload..... ")
-                    cursor2.execute(
-                        "INSERT INTO Marketing.dbo.Marketing_ETL(VTSID, LinkedInID, "
-                        "CompanyName, Developer, SupportingDeveloper, PortingDeveloper, CompanyWebsite, "
-                        "EmployeeRange, UltimateParent, Parent, Subsidiaries, City, RegionStateProvince, "
-                        "Country, BusinessClassification, BusinessSubclassification, Active, [Source], "
-                        "LinkedInURL, [Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, "
-                        "Founded, Growth6mth, Growth1yr, Growth2yr) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                        , VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, '', '', '', City, Region, Country, BizClass,
-                        BizSub, Active, Source, URL, Desc, Typ, Add, Ph,
-                        EmpLk, Found, SixMth, OneYr, TwoYr
-                    )
-
-                    conn.commit()
-                    cursor2.close()
-
-                except (pyodbc.Error, pyodbc.Warning) as err:
-                    print("Insert Error on Company = " + str(Name))
-                    err = str(err)
-
-                    worksheet.write(ExptRow, 0, VId)
-                    worksheet.write(ExptRow, 2, LId)
-                    worksheet.write(ExptRow, 3, Name)
-                    worksheet.write(ExptRow, 4, Dev)
-                    worksheet.write(ExptRow, 5, SDev)
-                    worksheet.write(ExptRow, 6, PDev)
-                    worksheet.write(ExptRow, 7, Web)
-                    worksheet.write(ExptRow, 8, EmpRange)
-                    # worksheet.write(ExptRow, 9, UParent)
-                    # worksheet.write(ExptRow, 10, Parent)
-                    # worksheet.write(ExptRow, 11, Sub)
-                    worksheet.write(ExptRow, 12, City)
-                    worksheet.write(ExptRow, 13, Region)
-                    worksheet.write(ExptRow, 14, Country)
-                    worksheet.write(ExptRow, 15, BizClass)
-                    worksheet.write(ExptRow, 16, BizSub)
-                    worksheet.write(ExptRow, 17, Active)
-                    worksheet.write(ExptRow, 18, Source)
-                    worksheet.write(ExptRow, 19, URL)
-                    worksheet.write(ExptRow, 20, Desc)
-                    worksheet.write(ExptRow, 21, Typ)
-                    worksheet.write(ExptRow, 22, Add)
-                    worksheet.write(ExptRow, 23, Ph)
-                    worksheet.write(ExptRow, 24, EmpLk)
-                    worksheet.write(ExptRow, 25, Found)
-                    worksheet.write(ExptRow, 26, SixMth)
-                    worksheet.write(ExptRow, 27, OneYr)
-                    worksheet.write(ExptRow, 28, TwoYr)
-                    worksheet.write(ExptRow, 29, err)
-
-                    ExptRow = ExptRow + 1
+                InsertRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, ExptRow)
 
             # A. Database is not blank, NewValue file upload
             else:
@@ -338,10 +397,6 @@ for ir1 in range(0, len(df)):
                         db_OneYr = row[20]
                         db_TwoYr = row[21]
                         db_VId = row[22]
-
-                        # db_UParent = row[18]
-                        # db_Parent = row[19]
-                        # db_Sub = row[20]
 
                         # print(Name, db_Name, LId, db_LId, "1")
                         # C. If LinkedInId is not blank and record found in database - Update
@@ -427,61 +482,7 @@ for ir1 in range(0, len(df)):
 
                             itemFound = True
 
-                            try:
-                                # print("Update " + Name + " 1")
-
-                                cursor1 = conn.cursor()
-
-                                cursor1.execute(
-                                    "UPDATE Marketing.dbo.Marketing_ETL SET CompanyWebsite=?, EmployeeRange=?, "
-                                    # "City=?, RegionStateProvince=?, Country=?, "
-                                    "BusinessClassification=?, BusinessSubclassification=?, Active=?, Source=?, LinkedInURL=?, "
-                                    "[Description]=?, [Type]=?, CompanyAddress=?, Phone=?, "
-                                    "EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, Growth1yr=?, Growth2yr= ? "
-                                    "WHERE LinkedInID=?"
-                                    , Web, EmpRange,
-                                    # City, Region, Country,
-                                    BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth,
-                                    OneYr, TwoYr, LId
-                                )
-
-                                conn.commit()
-
-                                cursor1.close()
-
-                            except (pyodbc.Error, pyodbc.Warning) as err:
-                                print("Update Error on Company = " + str(Name))
-                                err = str(err)
-
-                                worksheet.write(ExptRow, 0, VId)
-                                worksheet.write(ExptRow, 2, LId)
-                                worksheet.write(ExptRow, 3, Name)
-                                worksheet.write(ExptRow, 4, Dev)
-                                worksheet.write(ExptRow, 5, SDev)
-                                worksheet.write(ExptRow, 6, PDev)
-                                worksheet.write(ExptRow, 7, Web)
-                                worksheet.write(ExptRow, 8, EmpRange)
-                                # worksheet.write(ExptRow, 9, UParent)
-                                # worksheet.write(ExptRow, 10, Parent)
-                                # worksheet.write(ExptRow, 11, Sub)
-                                worksheet.write(ExptRow, 12, City)
-                                worksheet.write(ExptRow, 13, Region)
-                                worksheet.write(ExptRow, 14, Country)
-                                worksheet.write(ExptRow, 15, BizClass)
-                                worksheet.write(ExptRow, 16, BizSub)
-                                worksheet.write(ExptRow, 17, Active)
-                                worksheet.write(ExptRow, 18, Source)
-                                worksheet.write(ExptRow, 19, URL)
-                                worksheet.write(ExptRow, 20, Desc)
-                                worksheet.write(ExptRow, 21, Typ)
-                                worksheet.write(ExptRow, 22, Add)
-                                worksheet.write(ExptRow, 23, Ph)
-                                worksheet.write(ExptRow, 24, EmpLk)
-                                worksheet.write(ExptRow, 25, Found)
-                                worksheet.write(ExptRow, 26, SixMth)
-                                worksheet.write(ExptRow, 27, OneYr)
-                                worksheet.write(ExptRow, 28, TwoYr)
-                                worksheet.write(ExptRow, 29, err)
+                            UpdateRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Id)
 
                         # C. If LinkedInId is not blank and fuzzy check found in database - Update
                         else:
@@ -490,10 +491,6 @@ for ir1 in range(0, len(df)):
 
                             if (Ratio >= 80) and (Region == db_Region) and (Country == db_Country):
                                 # print(LId, db_LId, Name, db_Name, "3")
-
-                                # print(Name, db_Name, "Fuzzy check")
-                                # print(LId, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL,
-                                # Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_LId)
 
                                 LId = str(LId)
 
@@ -562,61 +559,7 @@ for ir1 in range(0, len(df)):
 
                                 itemFound = True
 
-                                try:
-                                    # print(LId, db_LId, "3")
-                                    # print("Update " + Name + " 2 ")
-
-                                    cursor2 = conn.cursor()
-
-                                    cursor2.execute(
-                                        "UPDATE Marketing.dbo.Marketing_ETL SET LinkedInID=?, CompanyWebsite=?, EmployeeRange=?, "
-                                        "City=?, RegionStateProvince=?, Country=?, BusinessClassification=?, "
-                                        "BusinessSubclassification=?, Active=?, Source=?, LinkedInURL=?, "
-                                        "[Description]=?, [Type]=?, CompanyAddress=?, Phone=?, "
-                                        "EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, Growth1yr=?, Growth2yr= ? "
-                                        "WHERE CompanyName=?"
-                                        , LId, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source,
-                                        URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Name
-                                    )
-
-                                    conn.commit()
-                                    # print(Web, LId, 'Record Updated', Stmt)
-
-                                    cursor2.close()
-
-                                except (pyodbc.Error, pyodbc.Warning) as err:
-                                    print("Update Error on Company = " + str(Name))
-                                    err = str(err)
-
-                                    worksheet.write(ExptRow, 0, VId)
-                                    worksheet.write(ExptRow, 2, LId)
-                                    worksheet.write(ExptRow, 3, Name)
-                                    worksheet.write(ExptRow, 4, Dev)
-                                    worksheet.write(ExptRow, 5, SDev)
-                                    worksheet.write(ExptRow, 6, PDev)
-                                    worksheet.write(ExptRow, 7, Web)
-                                    worksheet.write(ExptRow, 8, EmpRange)
-                                    # worksheet.write(ExptRow, 9, UParent)
-                                    # worksheet.write(ExptRow, 10, Parent)
-                                    # worksheet.write(ExptRow, 11, Sub)
-                                    worksheet.write(ExptRow, 12, City)
-                                    worksheet.write(ExptRow, 13, Region)
-                                    worksheet.write(ExptRow, 14, Country)
-                                    worksheet.write(ExptRow, 15, BizClass)
-                                    worksheet.write(ExptRow, 16, BizSub)
-                                    worksheet.write(ExptRow, 17, Active)
-                                    worksheet.write(ExptRow, 18, Source)
-                                    worksheet.write(ExptRow, 19, URL)
-                                    worksheet.write(ExptRow, 20, Desc)
-                                    worksheet.write(ExptRow, 21, Typ)
-                                    worksheet.write(ExptRow, 22, Add)
-                                    worksheet.write(ExptRow, 23, Ph)
-                                    worksheet.write(ExptRow, 24, EmpLk)
-                                    worksheet.write(ExptRow, 25, Found)
-                                    worksheet.write(ExptRow, 26, SixMth)
-                                    worksheet.write(ExptRow, 27, OneYr)
-                                    worksheet.write(ExptRow, 28, TwoYr)
-                                    worksheet.write(ExptRow, 29, err)
+                                UpdateRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Id)
 
                 # B. If LinkedId is blank and fuzzy check found in database - Update
                 else:
@@ -654,11 +597,6 @@ for ir1 in range(0, len(df)):
                         Ratio = fuzz.ratio(Name, db_Name)
 
                         if (Ratio >= 80) and (Region == db_Region) and (Country == db_Country):
-                            # print(LId, db_LId, Name, db_Name, "3")
-
-                            # print(Name, db_Name, "Fuzzy check")
-                            # print(LId, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL,
-                            #       Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_LId)
 
                             if Name in ('0', '', ' ', '$N/A'):
                                 Name = db_Name
@@ -725,61 +663,7 @@ for ir1 in range(0, len(df)):
 
                             itemFound = True
 
-                            try:
-                                # print(LId, db_LId, VId, db_VId, Name, db_Name, Ratio, " Update 1")
-                                # print("Update " + Name + " 3 ")
-
-                                cursor3 = conn.cursor()
-
-                                cursor3.execute(
-                                    "UPDATE Marketing.dbo.Marketing_ETL SET CompanyWebsite=?, EmployeeRange=?, "
-                                    "City=?, RegionStateProvince=?, Country=?, BusinessClassification=?, "
-                                    "BusinessSubclassification=?, Active=?, Source=?, LinkedInURL=?, "
-                                    "[Description]=?, [Type]=?, CompanyAddress=?, Phone=?, "
-                                    "EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, Growth1yr=?, Growth2yr= ? "
-                                    "WHERE CompanyName=?"
-                                    , Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc,
-                                    Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Name
-                                )
-
-                                conn.commit()
-                                # print(Web, LId, 'Record Updated', Stmt)
-
-                                cursor3.close()
-
-                            except (pyodbc.Error, pyodbc.Warning) as err:
-                                print("Update Error on Company = " + str(Name))
-                                err = str(err)
-
-                                worksheet.write(ExptRow, 0, VId)
-                                worksheet.write(ExptRow, 2, LId)
-                                worksheet.write(ExptRow, 3, Name)
-                                worksheet.write(ExptRow, 4, Dev)
-                                worksheet.write(ExptRow, 5, SDev)
-                                worksheet.write(ExptRow, 6, PDev)
-                                worksheet.write(ExptRow, 7, Web)
-                                worksheet.write(ExptRow, 8, EmpRange)
-                                # worksheet.write(ExptRow, 9, UParent)
-                                # worksheet.write(ExptRow, 10, Parent)
-                                # worksheet.write(ExptRow, 11, Sub)
-                                worksheet.write(ExptRow, 12, City)
-                                worksheet.write(ExptRow, 13, Region)
-                                worksheet.write(ExptRow, 14, Country)
-                                worksheet.write(ExptRow, 15, BizClass)
-                                worksheet.write(ExptRow, 16, BizSub)
-                                worksheet.write(ExptRow, 17, Active)
-                                worksheet.write(ExptRow, 18, Source)
-                                worksheet.write(ExptRow, 19, URL)
-                                worksheet.write(ExptRow, 20, Desc)
-                                worksheet.write(ExptRow, 21, Typ)
-                                worksheet.write(ExptRow, 22, Add)
-                                worksheet.write(ExptRow, 23, Ph)
-                                worksheet.write(ExptRow, 24, EmpLk)
-                                worksheet.write(ExptRow, 25, Found)
-                                worksheet.write(ExptRow, 26, SixMth)
-                                worksheet.write(ExptRow, 27, OneYr)
-                                worksheet.write(ExptRow, 28, TwoYr)
-                                worksheet.write(ExptRow, 29, err)
+                            UpdateRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Id)
 
                         # if not itemFound1:
                             # print(Name, "")
@@ -791,69 +675,7 @@ for ir1 in range(0, len(df)):
                 # If the record from excel is not found in database (Based on LinkedInId, CompanyName, Country and State
                 if not itemFound:
 
-                    # print(Name, LId, "3")
-                    # print(LId, db_LId, VId, db_VId, Name, db_Name, " Insert 2")
-
-                    # print('2', VId, Name, Region, Country, EmpLk, 'Insert Record')
-                    cursor4 = conn.cursor()
-
-                    try:
-                        # print("Insert " + Name + " 4 ")
-                        cursor4.execute(
-                            "INSERT INTO Marketing.dbo.Marketing_ETL(VTSID, LinkedInID, "
-                            "CompanyName, Developer, SupportingDeveloper, PortingDeveloper, CompanyWebsite, "
-                            "EmployeeRange, UltimateParent, Parent, Subsidiaries, City, RegionStateProvince, "
-                            "Country, BusinessClassification, BusinessSubclassification, Active, [Source], "
-                            "LinkedInURL, [Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, "
-                            "Founded, Growth6mth, Growth1yr, Growth2yr) "
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-                            , VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, '', '', '', City, Region, Country, BizClass, BizSub,
-                            Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr
-                        )
-
-                        conn.commit()
-                        cursor4.close()
-
-                    except (pyodbc.Error, pyodbc.Warning) as err:
-                        print("Insert Error on Company = " + str(Name))
-                        err = str(err)
-
-                        worksheet.write(ExptRow, 0, VId)
-                        worksheet.write(ExptRow, 2, LId)
-                        worksheet.write(ExptRow, 3, Name)
-                        worksheet.write(ExptRow, 4, Dev)
-                        worksheet.write(ExptRow, 5, SDev)
-                        worksheet.write(ExptRow, 6, PDev)
-                        worksheet.write(ExptRow, 7, Web)
-                        worksheet.write(ExptRow, 8, EmpRange)
-                        # worksheet.write(ExptRow, 9, UParent)
-                        # worksheet.write(ExptRow, 10, Parent)
-                        # worksheet.write(ExptRow, 11, Sub)
-                        worksheet.write(ExptRow, 12, City)
-                        worksheet.write(ExptRow, 13, Region)
-                        worksheet.write(ExptRow, 14, Country)
-                        worksheet.write(ExptRow, 15, BizClass)
-                        worksheet.write(ExptRow, 16, BizSub)
-                        worksheet.write(ExptRow, 17, Active)
-                        worksheet.write(ExptRow, 18, Source)
-                        worksheet.write(ExptRow, 19, URL)
-                        worksheet.write(ExptRow, 20, Desc)
-                        worksheet.write(ExptRow, 21, Typ)
-                        worksheet.write(ExptRow, 22, Add)
-                        worksheet.write(ExptRow, 23, Ph)
-                        worksheet.write(ExptRow, 24, EmpLk)
-                        worksheet.write(ExptRow, 25, Found)
-                        worksheet.write(ExptRow, 26, SixMth)
-                        worksheet.write(ExptRow, 27, OneYr)
-                        worksheet.write(ExptRow, 28, TwoYr)
-                        worksheet.write(ExptRow, 29, err)
-
-                        ExptRow = ExptRow + 1
-
-                        # print(Web, LId, 'Record Updated', Stmt)
-                        # print('5', LId, Name, Region, Country, 'Create Record')
-                        # print(VId, now, now1, now2)
+                    InsertRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, ExptRow)
 
 my_file = Path(dst)
 if my_file.is_file():
