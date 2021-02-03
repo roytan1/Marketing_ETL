@@ -56,7 +56,7 @@ cursor.close()
 
 cursor1 = conn.cursor()
 cursor1.execute(
-    'SELECT ID, TitleID, TitleName FROM Marketing.dbo.GamesTitles ORDER BY ID'
+    'SELECT ID, TitleID, TitleName, IGDB_Website FROM Marketing.dbo.GamesTitles ORDER BY ID'
 )
 
 result1 = cursor1.fetchall()
@@ -173,8 +173,9 @@ for ir in range(0, len(df)):
                     db_ID1 = row1[0]
                     db_TID1 = row1[1]
                     db_Name1 = row1[2]
+                    db_IGDB1 = row1[3]
 
-                    if str(Name) == str(db_Name1):
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
 
                         itemFound = True
 
@@ -198,35 +199,37 @@ for ir in range(0, len(df)):
                         itemFound = True
                         break
 
-                # if Title + Supporting Developer not found in SupportingDeveloper table in DB. Inserrt record into the SupportingDeveloper table.
-                if not itemFound:
-                    for row2 in result1:
+            # if Title + Supporting Developer not found in SupportingDeveloper table in DB. Inserrt record into the SupportingDeveloper table.
+            if not itemFound:
+                for row2 in result1:
 
-                        db_ID1 = row2[0]
-                        db_TID1 = row2[1]
-                        db_Name1 = row2[2]
+                    db_ID1 = row2[0]
+                    db_TID1 = row2[1]
+                    db_Name1 = row2[2]
+                    db_IGDB1 = row2[3]
 
-                        # if Title Found in title table
-                        if str(Name) == str(db_Name1):
-                            itemFound1 = True
+                    # if Title Found in title table
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
 
-                            InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, SupportDev, StudioID, VTSID, ExptRow)
+                        itemFound1 = True
 
-                    # If title not found after checking GamesTitle list, write exception to exception file.
-                    if not itemFound1:
-                        err = str("Title not found in Title table. Please kindly check the title list.")
+                        InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, SupportDev, StudioID, VTSID, ExptRow)
 
-                        worksheet.write(ExptRow, 0, TId)
-                        worksheet.write(ExptRow, 1, Name)
-                        worksheet.write(ExptRow, 2, IGDB)
-                        worksheet.write(ExptRow, 3, NewZoo)
-                        worksheet.write(ExptRow, 4, SupportDev)
-                        worksheet.write(ExptRow, 5, StudioID)
-                        worksheet.write(ExptRow, 6, VTSID)
-                        worksheet.write(ExptRow, 7, err)
+                # If title not found after checking GamesTitle list, write exception to exception file.
+                if not itemFound1:
+                    err = str("Title not found in Title table. Please kindly check the title list.")
 
-                        ExptRow = ExptRow + 1
-        # End of Developer File Load
+                    worksheet.write(ExptRow, 0, TId)
+                    worksheet.write(ExptRow, 1, Name)
+                    worksheet.write(ExptRow, 2, IGDB)
+                    worksheet.write(ExptRow, 3, NewZoo)
+                    worksheet.write(ExptRow, 4, SupportDev)
+                    worksheet.write(ExptRow, 5, StudioID)
+                    worksheet.write(ExptRow, 6, VTSID)
+                    worksheet.write(ExptRow, 7, err)
+
+                    ExptRow = ExptRow + 1
+    # End of Developer File Load
 
 my_file = Path(dst)
 if my_file.is_file():

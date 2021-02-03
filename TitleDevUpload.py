@@ -57,7 +57,7 @@ cursor.close()
 
 cursor1 = conn.cursor()
 cursor1.execute(
-    'SELECT ID, TitleID, TitleName FROM Marketing.dbo.GamesTitles ORDER BY ID'
+    'SELECT ID, TitleID, TitleName, IGDB_Website FROM Marketing.dbo.GamesTitles ORDER BY ID'
 )
 
 result1 = cursor1.fetchall()
@@ -95,7 +95,6 @@ worksheet.write(0, 7, 'Error')
 
 ExptRow = 1
 
-
 def InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Developers, StudioID, VTSID, ExptRow):
     
     cursor = conn.cursor()
@@ -127,8 +126,7 @@ def InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Developers, StudioID, VTSID, E
         ExptRow = ExptRow + 1
 
         return ExptRow
-
-
+        
 # Start of Developer File Load
 for ir in range(0, len(df)):
     # for ir1 in range(8, 9):
@@ -177,16 +175,15 @@ for ir in range(0, len(df)):
                     db_ID1 = row1[0]
                     db_TID1 = row1[1]
                     db_Name1 = row1[2]
+                    db_IGDB1 = row1[3]
 
-                    # print(db_ID1, TId, Name, db_Name1, 1)
-
-                    if str(Name) == str(db_Name1):
-
+                    # Check for matching title name
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
+                        # print(TId, Developers, "1")
                         itemFound = True
-
                         InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Developers, StudioID, VTSID, ExptRow)
 
-            # A. Database is not blank, NewValue file upload
+            # A. Database is not blank
             else:
                 for row in result:
 
@@ -199,45 +196,47 @@ for ir in range(0, len(df)):
                     db_StudioID = row[6]
                     db_VTSID = row[7]
 
-                    # if Title with different developer Found in developer table
-                    # if str(Valid) != str(db_Valid):
+                    # if record found in developer table
                     if str(Name) == str(db_Name) and str(Developers) == str(db_Developer) and str(IGDB) == str(db_IGDB):
+                        # print(TId, Developers, "2")
                         itemFound = True
                         # print(Name, db_Name, Publishers, db_Publisher, 1)
                         break
 
-                # New Record found
-                if not itemFound:
+            # New Record found
+            if not itemFound:
 
-                    for row2 in result1:
+                for row2 in result1:
 
-                        db_ID1 = row2[0]
-                        db_TID1 = row2[1]
-                        db_Name1 = row2[2]
+                    db_ID1 = row2[0]
+                    db_TID1 = row2[1]
+                    db_Name1 = row2[2]
+                    db_IGDB1 = row2[3]
 
-                        # if Title Found in title table
-                        if str(Name) == str(db_Name1):
-                            
-                            itemFound1 = True
+                    # if Title Found in title table
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
+                        # print(TId, Developers, "3")
+                        itemFound1 = True
 
-                            InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Developers, StudioID, VTSID, ExptRow)
-                            
-                    if not itemFound1:
-                        # print("Insert Error on TitleName_Publisher = " + str(Name))
-                        err = str("Title not found in Title table. Please kindly check the title list.")
+                        InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Developers, StudioID, VTSID, ExptRow)
+                        
+                if not itemFound1:
+                    # print(TId, Developers, "4")
+                    # print("Insert Error on TitleName_Dev = " + str(Name))
+                    err = str("Title Name or IGDB not found in Title table. Please kindly check the title list.")
 
-                        worksheet.write(ExptRow, 0, TId)
-                        worksheet.write(ExptRow, 1, Name)
-                        worksheet.write(ExptRow, 2, IGDB)
-                        worksheet.write(ExptRow, 3, NewZoo)
-                        worksheet.write(ExptRow, 4, Developers)
-                        worksheet.write(ExptRow, 5, StudioID)
-                        worksheet.write(ExptRow, 6, VTSID)
-                        worksheet.write(ExptRow, 7, err)
+                    worksheet.write(ExptRow, 0, TId)
+                    worksheet.write(ExptRow, 1, Name)
+                    worksheet.write(ExptRow, 2, IGDB)
+                    worksheet.write(ExptRow, 3, NewZoo)
+                    worksheet.write(ExptRow, 4, Developers)
+                    worksheet.write(ExptRow, 5, StudioID)
+                    worksheet.write(ExptRow, 6, VTSID)
+                    worksheet.write(ExptRow, 7, err)
 
-                        ExptRow = ExptRow + 1
-
-        # End of Developer File Load
+                    ExptRow = ExptRow + 1
+                    
+    # End of Developer File Load
         
 my_file = Path(dst)
 if my_file.is_file():

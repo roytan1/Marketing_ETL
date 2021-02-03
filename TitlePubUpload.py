@@ -50,7 +50,7 @@ cursor.close()
 
 cursor1 = conn.cursor()
 cursor1.execute(
-    'SELECT ID, TitleID, TitleName FROM Marketing.dbo.GamesTitles ORDER BY ID'
+    'SELECT ID, TitleID, TitleName, IGDB_Website FROM Marketing.dbo.GamesTitles ORDER BY ID'
 )
 
 result1 = cursor1.fetchall()
@@ -175,13 +175,13 @@ for ir in range(0, len(df)):
                     db_ID1 = row1[0]
                     db_TID1 = row1[1]
                     db_Name1 = row1[2]
+                    db_IGDB1 = row1[3]
 
                     # print(db_ID1, TId, Name, db_Name1, 1)
 
-                    if str(Name) == str(db_Name1):
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
 
                         itemFound = True
-
                         InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID, ExptRow)
 
             # A. Database is not blank, NewValue file upload
@@ -205,36 +205,37 @@ for ir in range(0, len(df)):
                         # print(Name, db_Name, Publishers, db_Publisher, 1)
                         break
 
-                # New Record found
-                if not itemFound:
+            # New Record found
+            if not itemFound:
 
-                    for row2 in result1:
+                for row2 in result1:
 
-                        db_ID1 = row2[0]
-                        db_TID1 = row2[1]
-                        db_Name1 = row2[2]
+                    db_ID1 = row2[0]
+                    db_TID1 = row2[1]
+                    db_Name1 = row2[2]
+                    db_IGDB1 = row2[3]
 
-                        # if Title Found in title table
-                        if str(Name) == str(db_Name1):
-                            itemFound1 = True
+                    # if Title Found in title table
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
+                        itemFound1 = True
 
-                            InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID, ExptRow)
+                        InsertRecord(db_ID1, TId, Name, IGDB, NewZoo, Publishers, StudioID, VTSID, ExptRow)
 
-                    if not itemFound1:
-                        # print("Insert Error on TitleName_Publisher = " + str(Name))
-                        err = str("Title not found in Title table. Please kindly check the title list.")
+                if not itemFound1:
+                    # print("Insert Error on TitleName_Publisher = " + str(Name))
+                    err = str("Title Name or IGDB not found in Title table. Please kindly check the title list.")
 
-                        worksheet.write(ExptRow, 0, TId)
-                        worksheet.write(ExptRow, 1, Name)
-                        worksheet.write(ExptRow, 2, IGDB)
-                        worksheet.write(ExptRow, 3, NewZoo)
-                        worksheet.write(ExptRow, 4, Publishers)
-                        worksheet.write(ExptRow, 5, StudioID)
-                        worksheet.write(ExptRow, 6, VTSID)
-                        worksheet.write(ExptRow, 7, err)
+                    worksheet.write(ExptRow, 0, TId)
+                    worksheet.write(ExptRow, 1, Name)
+                    worksheet.write(ExptRow, 2, IGDB)
+                    worksheet.write(ExptRow, 3, NewZoo)
+                    worksheet.write(ExptRow, 4, Publishers)
+                    worksheet.write(ExptRow, 5, StudioID)
+                    worksheet.write(ExptRow, 6, VTSID)
+                    worksheet.write(ExptRow, 7, err)
 
-                        ExptRow = ExptRow + 1
-        # End of Developer File Load
+                    ExptRow = ExptRow + 1
+    # End of Developer File Load
 
 my_file = Path(dst)
 if my_file.is_file():

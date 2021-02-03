@@ -35,12 +35,12 @@ dir5 = config['File5']['dir5']
 dt = datetime.today().strftime('%Y%m%d')
 
 # Initial First Upload of MasterList
-# src = dir1
-# dst = dir4 + "_" + dt + ".xlsx"
+src = dir1
+dst = dir4 + "_" + dt + ".xlsx"
 
 # For VendorUpdate_NewValue
-src = dir2
-dst = dir5 + "_" + dt + ".xlsx"
+# src = dir2
+# dst = dir5 + "_" + dt + ".xlsx"
 
 xpt = dir3 + "_Exception" + "_" + dt + ".xlsx"
 
@@ -48,10 +48,8 @@ conn = pyodbc.connect('driver={ODBC Driver 17 for SQL Server};SERVER='+host+';DA
 
 cursor = conn.cursor()
 cursor.execute(
-    'SELECT ID, LinkedInID, CompanyName, CompanyWebsite, EmployeeRange, City, RegionStateProvince, Country, '
-    'BusinessClassification, BusinessSubclassification, Active, '
-    'Source, LinkedInURL, [Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, '
-    'Founded, Growth6mth, Growth1yr, Growth2yr, VTSID FROM Marketing.dbo.Marketing_ETL ORDER BY ID'
+    'SELECT ID, LinkedInID, CompanyName, CompanyWebsite, EmployeeRange, City, RegionStateProvince, Country, BusinessClassification, BusinessSubclassification, Active, Source, '
+    'LinkedInURL, [Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, Founded, Growth6mth, Growth1yr, Growth2yr, VTSID FROM Marketing.dbo.Marketing_ETL_TEST ORDER BY ID'
     # ', UltimateParent, Parent, Subsidiaries '
 )
 
@@ -72,9 +70,9 @@ else:
 print("Creating Exception File ....")
 
 # For first upload of MasterList
-# df = pd.read_excel('%s' %(dir1), sheet_name='New', engine='openpyxl')
+df = pd.read_excel('%s' %(dir1), sheet_name='New', engine='openpyxl')
 # For VendorUpdate_NewValue
-df = pd.read_excel('%s' %(dir2), sheet_name='New', engine='openpyxl')
+# df = pd.read_excel('%s' %(dir2), sheet_name='New', engine='openpyxl')
 
 df = df.replace(np.nan, ' ', regex=True)
 df_Header = df.columns.ravel()
@@ -103,17 +101,12 @@ def InsertRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, C
     try:
         # print("First Upload..... ")
         cursor.execute(
-            "INSERT INTO Marketing.dbo.Marketing_ETL(VTSID, LinkedInID, "
-            "CompanyName, Developer, SupportingDeveloper, PortingDeveloper, CompanyWebsite, "
-            "EmployeeRange, UltimateParent, Parent, Subsidiaries, City, RegionStateProvince, "
-            "Country, BusinessClassification, BusinessSubclassification, Active, [Source], "
-            "LinkedInURL, [Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, "
-            "Founded, Growth6mth, Growth1yr, Growth2yr) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            , VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, '', '', '', City, Region, Country, BizClass,
-            BizSub, Active, Source, URL, Desc, Typ, Add, Ph,
-            EmpLk, Found, SixMth, OneYr, TwoYr
+            "INSERT INTO Marketing.dbo.Marketing_ETL_TEST(VTSID, LinkedInID, CompanyName, Developer, SupportingDeveloper, PortingDeveloper, CompanyWebsite, EmployeeRange, "
+            "UltimateParent, Parent, Subsidiaries, City, RegionStateProvince, Country, BusinessClassification, BusinessSubclassification, Active, [Source], LinkedInURL, "
+            "[Description], [Type], CompanyAddress, Phone, EmployeesonLinkedIn, Founded, Growth6mth, Growth1yr, Growth2yr) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            , VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, '', '', '', City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, 
+            OneYr, TwoYr
         )
 
         conn.commit()
@@ -164,10 +157,9 @@ def UpdateRecord(VId, LId, Name, Dev, SDev, PDev, Web, EmpRange, City, Region, C
 
     try:
         cursor.execute(
-            "UPDATE Marketing.dbo.Marketing_ETL SET LinkedInID=?, CompanyWebsite=?, EmployeeRange=?, "
-            "City=?, RegionStateProvince=?, Country=?, BusinessClassification=?, BusinessSubclassification=?, Active=?, Source=?, LinkedInURL=?, "
-            "[Description]=?, [Type]=?, CompanyAddress=?, Phone=?, EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, Growth1yr=?, Growth2yr= ? "
-            "WHERE ID=?"
+            "UPDATE Marketing.dbo.Marketing_ETL_TEST SET LinkedInID=?, CompanyWebsite=?, EmployeeRange=?, City=?, RegionStateProvince=?, Country=?, BusinessClassification=?, "
+            "BusinessSubclassification=?, Active=?, Source=?, LinkedInURL=?, [Description]=?, [Type]=?, CompanyAddress=?, Phone=?, EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, "
+            "Growth1yr=?, Growth2yr= ? WHERE ID=?"
             , LId, Web, EmpRange, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk, Found, SixMth, OneYr, TwoYr, db_Id
         )
 

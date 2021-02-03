@@ -57,7 +57,7 @@ cursor.close()
 
 cursor1 = conn.cursor()
 cursor1.execute(
-    'SELECT ID, TitleID, TitleName FROM Marketing.dbo.GamesTitles ORDER BY ID'
+    'SELECT ID, TitleID, TitleName, IGDB_Website FROM Marketing.dbo.GamesTitles ORDER BY ID'
 )
 
 result1 = cursor1.fetchall()
@@ -228,10 +228,10 @@ for ir in range(0, len(df)):
                     db_ID1 = row1[0]
                     db_TID1 = row1[1]
                     db_Name1 = row1[2]
-
+                    db_IGDB1 = row1[3]
                     # print(db_ID1, TId, Name, db_Name1, 1)
 
-                    if str(Name) == str(db_Name1):
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
                         # print("Second Loop", value2)
                         # print(db_ID1, db_TID1, db_Name1, TId, Name, Developers, StudioID, VTSID, 2)
 
@@ -323,66 +323,67 @@ for ir in range(0, len(df)):
                             # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 3)
                             break
 
-                # New Record found
-                if not itemFound:
-                    # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 4)
+            # New Record found
+            if not itemFound:
+                # print(Name, db_Name, RelPlatform, db_RelPlatform, RelDate, db_RelDate, 4)
 
-                    for row2 in result1:
+                for row2 in result1:
 
-                        db_ID1 = row2[0]
-                        db_TID1 = row2[1]
-                        db_Name1 = row2[2]
+                    db_ID1 = row2[0]
+                    db_TID1 = row2[1]
+                    db_Name1 = row2[2]
+                    db_IGDB1 = row2[3]
+                # print(db_ID1, TId, Name, db_Name1, 1)
 
-                        # if Title Found in title table
-                        if str(Name) == str(db_Name1):
-                            itemFound1 = True
-                            
-                            insertRecord(db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow)
-                            '''
-                            cursor3 = conn.cursor()
 
-                            try:
-                                # print("First Upload..... ")
-                                cursor3.execute(
-                                    "INSERT INTO GamesTitles_RelDate(ID, TitleID, TitleName, ReleasePlatform, ReleaseDate, IGDB_Website, NewZoo_Website) "
-                                    "VALUES (?, ?, ?, ?, ?, ?, ?)"
-                                    , db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo
-                                )
+                    # if Title Found in title table
+                    if str(Name) == str(db_Name1) and str(IGDB) == str(db_IGDB1):
+                        itemFound1 = True
+                        
+                        insertRecord(db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo, ExptRow)
+                        '''
+                        cursor3 = conn.cursor()
 
-                                conn.commit()
-                                cursor3.close()
+                        try:
+                            # print("First Upload..... ")
+                            cursor3.execute(
+                                "INSERT INTO GamesTitles_RelDate(ID, TitleID, TitleName, ReleasePlatform, ReleaseDate, IGDB_Website, NewZoo_Website) "
+                                "VALUES (?, ?, ?, ?, ?, ?, ?)"
+                                , db_ID1, TId, Name, RelPlatform, RelDate, IGDB, NewZoo
+                            )
 
-                            except (pyodbc.Error, pyodbc.Warning) as err:
-                                print("Insert Error on TitleName_RelDate = " + str(Name))
-                                err = str(err)
+                            conn.commit()
+                            cursor3.close()
 
-                                worksheet.write(ExptRow, 0, TId)
-                                worksheet.write(ExptRow, 1, Name)
-                                worksheet.write(ExptRow, 2, RelPlatform)
-                                worksheet.write(ExptRow, 3, RelDate)
-                                worksheet.write(ExptRow, 4, IGDB)
-                                worksheet.write(ExptRow, 5, NewZoo)
-                                worksheet.write(ExptRow, 6, err)
+                        except (pyodbc.Error, pyodbc.Warning) as err:
+                            print("Insert Error on TitleName_RelDate = " + str(Name))
+                            err = str(err)
 
-                                ExptRow = ExptRow + 1
-                            '''
+                            worksheet.write(ExptRow, 0, TId)
+                            worksheet.write(ExptRow, 1, Name)
+                            worksheet.write(ExptRow, 2, RelPlatform)
+                            worksheet.write(ExptRow, 3, RelDate)
+                            worksheet.write(ExptRow, 4, IGDB)
+                            worksheet.write(ExptRow, 5, NewZoo)
+                            worksheet.write(ExptRow, 6, err)
 
-                    if not itemFound1:
-                        # print("Insert Error on TitleName_Publisher = " + str(Name))
-                        err = str("Title not found in Title table. Please kindly check the title list.")
+                            ExptRow = ExptRow + 1
+                        '''
 
-                        worksheet.write(ExptRow, 0, TId)
-                        worksheet.write(ExptRow, 1, Name)
-                        worksheet.write(ExptRow, 2, RelPlatform)
-                        worksheet.write(ExptRow, 3, RelDate)
-                        worksheet.write(ExptRow, 4, IGDB)
-                        worksheet.write(ExptRow, 5, NewZoo)
-                        worksheet.write(ExptRow, 6, err)
+                if not itemFound1:
+                    # print("Insert Error on TitleName_Publisher = " + str(Name))
+                    err = str("Title Name or IGDB not found in Title table. Please kindly check the title list.")
 
-                        ExptRow = ExptRow + 1
-        # End of Developer File Load
+                    worksheet.write(ExptRow, 0, TId)
+                    worksheet.write(ExptRow, 1, Name)
+                    worksheet.write(ExptRow, 2, RelPlatform)
+                    worksheet.write(ExptRow, 3, RelDate)
+                    worksheet.write(ExptRow, 4, IGDB)
+                    worksheet.write(ExptRow, 5, NewZoo)
+                    worksheet.write(ExptRow, 6, err)
 
-        # value1 + 1
+                    ExptRow = ExptRow + 1
+    # End of Developer File Load
 
 my_file = Path(dst)
 if my_file.is_file():
@@ -392,10 +393,6 @@ else:
     shutil.copy(src, dst)
 
 workbook.close()
-# workbook1.close()
-# workbook2.close()
-# workbook3.close()
-# workbook4.close()
 
 # if no exception, remove the file
 if ExptRow == 1:
