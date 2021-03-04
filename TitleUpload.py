@@ -29,6 +29,9 @@ uid = config['database']['pass']
 dir9 = config['File9']['dir9']
 dir10 = config['File10']['dir10']
 dir11 = config['File11']['dir11']
+# dir9 = config['File12']['dir12']
+# dir10 = config['File13']['dir13']
+# dir11 = config['File14']['dir14']
 
 dt = datetime.today().strftime('%Y%m%d')
 # Initial First Upload of MasterList
@@ -48,7 +51,7 @@ conn = pyodbc.connect(
 cursor = conn.cursor()
 cursor.execute(
     'SELECT TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, Franchises, '
-    'GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website, ID FROM Marketing.dbo.GamesTitles ORDER BY ID'
+    'GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website, Released, ID FROM Marketing.dbo.GamesTitles ORDER BY ID'
     # ', UltimateParent, Parent, Subsidiaries '
 )
 
@@ -92,10 +95,10 @@ worksheet = workbook.add_worksheet()
 
 for col_num, data in enumerate(df_Header):
     # print(data)
-    if col_num <= 12:
+    if col_num <= 13:
         worksheet.write(0, col_num, data)
 
-worksheet.write(0, 13, 'Error')
+worksheet.write(0, 14, 'Error')
 
 # Create UnFound Worksheet
 workbook1 = xlsxwriter.Workbook('%s' % (uft))
@@ -103,7 +106,7 @@ worksheet1 = workbook1.add_worksheet()
 
 for col_num, data in enumerate(df_Header):
     # print(data)
-    if col_num <= 12:
+    if col_num <= 13:
         worksheet1.write(0, col_num, data)
 
 # workbook.close()
@@ -111,15 +114,15 @@ for col_num, data in enumerate(df_Header):
 ExptRow = 1
 ufRow = 1
 
-def insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, ExptRow):
+def insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, Released, ExptRow):
     cursor = conn.cursor()
 
     try:
         cursor.execute(
             "INSERT INTO GamesTitles(TitleID, TitleName, Metascore, GameModes, Genre, Themes, Series, PlayerPerspectives, "
-            "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo
+            "Franchises, GameEngine, AlternativeNames, IGDB_Website, NewZoo_Website, Released) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, Released
         )
 
         conn.commit()
@@ -142,14 +145,15 @@ def insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, E
         worksheet.write(ExptRow, 10, AltName)
         worksheet.write(ExptRow, 11, IGDB)
         worksheet.write(ExptRow, 12, NewZoo)
-        worksheet.write(ExptRow, 13, err)
+        worksheet.write(ExptRow, 13, Released)
+        worksheet.write(ExptRow, 14, err)
 
         ExptRow = ExptRow + 1
 
         return ExptRow
 
 
-def updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id):
+def updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, Released, db_Id):
     cursor = conn.cursor()
     
     try:
@@ -157,8 +161,8 @@ def updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, E
         cursor.execute(
             "UPDATE Marketing.dbo.GamesTitles SET TitleID=?, TitleName=?, Metascore=?, GameModes=?, "
             "Genre=?, Themes=?, Series=?, PlayerPerspectives=?, Franchises=?, GameEngine=?, AlternativeNames=?, "
-            "NewZoo_Website=? WHERE ID=?"
-            , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id
+            "NewZoo_Website=?, Released=? WHERE ID=?"
+            , TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, Released, db_Id
         )
 
         conn.commit()
@@ -182,7 +186,8 @@ def updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, E
         worksheet.write(ExptRow, 10, AltName)
         worksheet.write(ExptRow, 11, IGDB)
         worksheet.write(ExptRow, 12, NewZoo)
-        worksheet.write(ExptRow, 13, err)
+        worksheet.write(ExptRow, 13, Released)
+        worksheet.write(ExptRow, 14, err)
 
 # print(len(df))
 # print(len(df.columns))
@@ -198,7 +203,7 @@ for ir1 in range(0, len(df)):
             itemFound = False
 
             if str(df.iat[ir1, 0]) not in ('0', '0.0', '#N/A', '', ' '):
-                TId = str(df.iat[ir1, 0])
+                TId = int(df.iat[ir1, 0])
             else:
                 TId = str('')
 
@@ -251,10 +256,14 @@ for ir1 in range(0, len(df)):
             if NewZoo in ('0', '0.0', '', ' ', '$N/A'):
                 NewZoo = ''
 
+            Released = str(df.iat[ir1, 13])
+            if Released in ('0', '0.0', '', ' ', '$N/A'):
+                Released = ''    
+
             # A. If database is blank, it is an initial upload
             if len(result) == 0:
 
-                insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, ExptRow)
+                insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, Released, ExptRow)
 
             # A. Database is not blank, NewValue file upload
             else:
@@ -278,7 +287,8 @@ for ir1 in range(0, len(df)):
                         db_AltName = row[10]
                         db_IGDB = row[11]
                         db_NewZoo = row[12]
-                        db_Id = row[13]
+                        db_Released = row[13]
+                        db_Id = row[14]
 
                         # if NewZoo is not blank and IGDB or NewZoo match
                         if str(NewZoo) != '':
@@ -324,10 +334,14 @@ for ir1 in range(0, len(df)):
                                 if NewZoo in ('0', '', ' ', '$N/A'):
                                     NewZoo = db_NewZoo
 
+                                if Released in ('0', '', ' ', '$N/A'):
+                                    Released = db_Released
+
                                 itemFound = True
 
-                                updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id)
-
+                                updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, Released, db_Id)
+                                
+                                # print(Name, "1")
                             else:
                                 Ratio = fuzz.ratio(Name, db_Name)
 
@@ -335,7 +349,7 @@ for ir1 in range(0, len(df)):
                                     # print(TId, Name, db_Name, IGDB, db_IGDB, Ratio, -4)
                                 
                                 if (Ratio >= 90):
-
+                                    # print(Name, "2")
                                     itemFound = True
 
                                     worksheet1.write(ufRow, 0, TId)
@@ -351,6 +365,7 @@ for ir1 in range(0, len(df)):
                                     worksheet1.write(ufRow, 10, AltName)
                                     worksheet1.write(ufRow, 11, IGDB)
                                     worksheet1.write(ufRow, 12, NewZoo)
+                                    worksheet1.write(ufRow, 13, Released)
                                     # worksheet.write(ExptRow, 13, err)
 
                                     ufRow = ufRow + 1
@@ -399,10 +414,13 @@ for ir1 in range(0, len(df)):
                                 if NewZoo in ('0', '', ' ', '$N/A'):
                                     NewZoo = db_NewZoo
 
+                                if Released in ('0', '', ' ', '$N/A'):
+                                    Released = db_Released
+
                                 itemFound = True
 
-                                updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, db_Id)
-                                
+                                updateRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, NewZoo, Released, db_Id)
+                                # print(Name, "3")                        
                                 #if not itemFound:
                                 #    print("6")
                             #if not itemFound:
@@ -420,7 +438,7 @@ for ir1 in range(0, len(df)):
 
                                 if (Ratio >= 90):
                                     itemFound = True
-
+                                    # print(Name, "4")
                                     worksheet1.write(ufRow, 0, TId)
                                     worksheet1.write(ufRow, 1, Name)
                                     worksheet1.write(ufRow, 2, Meta)
@@ -434,6 +452,7 @@ for ir1 in range(0, len(df)):
                                     worksheet1.write(ufRow, 10, AltName)
                                     worksheet1.write(ufRow, 11, IGDB)
                                     worksheet1.write(ufRow, 12, NewZoo)
+                                    worksheet1.write(ufRow, 13, Released)
                                     # worksheet.write(ExptRow, 13, err)
 
                                     ufRow = ufRow + 1
@@ -445,7 +464,8 @@ for ir1 in range(0, len(df)):
 
                         TId = str(TId)
 
-                        insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, ExptRow)
+                        insertRecord(TId, Name, Meta, Mode, Genre, Themes, Series, PP, Franchises, Engine, AltName, IGDB, NewZoo, Released, ExptRow)
+                        # print(Name, "5")
 
 my_file = Path(dst)
 if my_file.is_file():

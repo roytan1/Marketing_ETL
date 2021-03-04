@@ -71,10 +71,10 @@ worksheet = workbook.add_worksheet()
 
 for col_num, data in enumerate(df_Header):
     # print(data)
-    if col_num <= 28:
+    if col_num <= 30:
         worksheet.write(0, col_num, data)
 
-worksheet.write(0, 29, 'Error')
+worksheet.write(0, 31, 'Error')
 
 ExptRow = 1
 
@@ -199,6 +199,14 @@ for ir in range(0, len(df)):
             if str(TwoYr) in ('0', '0.0', '', ' ', '$N/A'):
                 TwoYr = 0
 
+            SF_GUID = df.iat[ir, 29]
+            if str(TwoYr) in ('0', '0.0', '', ' ', '$N/A'):
+                TwoYr = ''
+
+            SF_Mapping_Status = df.iat[ir, 30]
+            if str(TwoYr) in ('0', '0.0', '', ' ', '$N/A'):
+                TwoYr = ''        
+
             for row in result:
                 # print(row[0])
                 # Cache database into variable list
@@ -309,9 +317,9 @@ for ir in range(0, len(df)):
                                 "UPDATE Marketing.dbo.Marketing_ETL SET LinkedInId=?, CompanyName=?, CompanyWebsite=?, EmployeeRange=?, UltimateParent=?, Parent=?, "
                                 "Subsidiaries=?, City=?, RegionStateProvince=?, Country=?, BusinessClassification=?, BusinessSubclassification=?, Active=?, Source=?, "
                                 "LinkedInURL=?, [Description]=?, [Type]=?, CompanyAddress=?, Phone=?, EmployeesonLinkedIn=?, Founded=?, Growth6mth=?, Growth1yr=?, "
-                                "Growth2yr=? WHERE ID= ?"
+                                "Growth2yr=?, SF_GUID=?, SF_Mapping_Status=? WHERE ID= ?"
                                 , LId, Name, Web, EmpRange, UParent, Parent, Sub, City, Region, Country, BizClass, BizSub, Active, Source, URL, Desc, Typ, Add, Ph, EmpLk,
-                                Found, SixMth, OneYr, TwoYr, Id
+                                Found, SixMth, OneYr, TwoYr, SF_GUID, SF_Mapping_Status, Id
                             )
 
                             conn.commit()
@@ -359,7 +367,9 @@ for ir in range(0, len(df)):
                 worksheet.write(ExptRow, 26, SixMth)
                 worksheet.write(ExptRow, 27, OneYr)
                 worksheet.write(ExptRow, 28, TwoYr)
-                worksheet.write(ExptRow, 29, err)
+                worksheet.write(ExptRow, 29, SF_GUID)
+                worksheet.write(ExptRow, 30, SF_Mapping_Status)
+                worksheet.write(ExptRow, 31, err)
 
                 ExptRow = ExptRow + 1
 
